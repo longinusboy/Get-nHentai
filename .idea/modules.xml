@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/getnhentai.iml" filepath="$PROJECT_DIR$/.idea/modules/getnhentai.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/getnhentai_main.iml" filepath="$PROJECT_DIR$/.idea/modules/getnhentai_main.iml" group="getnhentai" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/getnhentai_test.iml" filepath="$PROJECT_DIR$/.idea/modules/getnhentai_test.iml" group="getnhentai" />
+    </modules>
+  </component>
+</project>
