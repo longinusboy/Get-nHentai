@@ -8,6 +8,7 @@ import okio.Okio;
 
 import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
 
 /**
  * Created by David Silva on 19-03-2016.
@@ -16,7 +17,7 @@ public class GetNHentai {
     private String mainUrl;
     private int downloadWaitTimeMs;
 
-    final static String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0";
+    final static String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36";
 
     public GetNHentai(String mainUrl) {
         super();
@@ -51,7 +52,8 @@ public class GetNHentai {
             for (String line : lines) {
 
                 if (line.contains("<title>")) {
-                    title = line.substring(line.indexOf('>') + 1, Math.min(line.indexOf('&') - 1, line.indexOf(" &raquo;")))
+                    String unescapeLine = unescapeHTML(line);
+                    title = unescapeLine.substring(unescapeLine.indexOf('>') + 1, unescapeLine.indexOf(" » nhentai:"))
                             .trim().replaceAll("[:\\\"\\\\\\?\\|\\*]", "_").replace(".", "");
                 }
 
@@ -134,5 +136,80 @@ public class GetNHentai {
 
     public void setDownloadWaitTimeMs(int downloadWaitTimeMs) {
         this.downloadWaitTimeMs = (downloadWaitTimeMs > 250) ? downloadWaitTimeMs : 250;
+    }
+
+    // http://www.rgagnon.com/javadetails/java-0307.html
+    private static HashMap<String, String> htmlEntities;
+
+    static {
+        htmlEntities = new HashMap<String, String>();
+        htmlEntities.put("&lt;", "");
+        htmlEntities.put("&gt;", "");
+        htmlEntities.put("&amp;", "&");
+        htmlEntities.put("&quot;", "");
+        htmlEntities.put("&raquo;", "»");
+        htmlEntities.put("&agrave;", "à");
+        htmlEntities.put("&Agrave;", "À");
+        htmlEntities.put("&acirc;", "â");
+        htmlEntities.put("&auml;", "ä");
+        htmlEntities.put("&Auml;", "Ä");
+        htmlEntities.put("&Acirc;", "Â");
+        htmlEntities.put("&aring;", "å");
+        htmlEntities.put("&Aring;", "Å");
+        htmlEntities.put("&aelig;", "æ");
+        htmlEntities.put("&AElig;", "Æ");
+        htmlEntities.put("&ccedil;", "ç");
+        htmlEntities.put("&Ccedil;", "Ç");
+        htmlEntities.put("&eacute;", "é");
+        htmlEntities.put("&Eacute;", "É");
+        htmlEntities.put("&egrave;", "è");
+        htmlEntities.put("&Egrave;", "È");
+        htmlEntities.put("&ecirc;", "ê");
+        htmlEntities.put("&Ecirc;", "Ê");
+        htmlEntities.put("&euml;", "ë");
+        htmlEntities.put("&Euml;", "Ë");
+        htmlEntities.put("&ocirc;", "ô");
+        htmlEntities.put("&Ocirc;", "Ô");
+        htmlEntities.put("&ouml;", "ö");
+        htmlEntities.put("&Ouml;", "Ö");
+        htmlEntities.put("&oslash;", "ø");
+        htmlEntities.put("&Oslash;", "Ø");
+        htmlEntities.put("&szlig;", "ß");
+        htmlEntities.put("&ugrave;", "ù");
+        htmlEntities.put("&Ugrave;", "Ù");
+        htmlEntities.put("&ucirc;", "û");
+        htmlEntities.put("&Ucirc;", "Û");
+        htmlEntities.put("&uuml;", "ü");
+        htmlEntities.put("&Uuml;", "Ü");
+        htmlEntities.put("&nbsp;", " ");
+        htmlEntities.put("&copy;", "\u00a9");
+        htmlEntities.put("&reg;", "\u00ae");
+        htmlEntities.put("&euro;", "\u20a0");
+    }
+
+    private static String unescapeHTML(String source) {
+        int i, j;
+
+        boolean continueLoop;
+        int skip = 0;
+        do {
+            continueLoop = false;
+            i = source.indexOf("&", skip);
+            if (i > -1) {
+                j = source.indexOf(";", i);
+                if (j > i) {
+                    String entityToLookFor = source.substring(i, j + 1);
+                    String value = (String) htmlEntities.get(entityToLookFor);
+                    if (value != null) {
+                        source = source.substring(0, i) + value + source.substring(j + 1);
+                        continueLoop = true;
+                    } else {
+                        skip = i + 1;
+                        continueLoop = true;
+                    }
+                }
+            }
+        } while (continueLoop);
+        return source;
     }
 }
